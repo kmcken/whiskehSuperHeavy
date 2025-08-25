@@ -4,7 +4,13 @@ using UnityGERunner.UnityApplication;
 public class AIPProvider : IAIPProvider {
     public override SetupActions Start(SetupInfo info)
     {
-        return new SetupActions { name = "whiskehXv0" };
+        return new SetupActions
+        {
+            name = "whiskehXv0", 
+            fuel = 2500,
+            hardpoints = new string[]
+                {"HPEquips/AFighter/fa26_gun"}
+        };
     }
 
     public override InboundState Update(OutboundState state)
