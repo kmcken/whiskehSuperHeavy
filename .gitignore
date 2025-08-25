@@ -1,0 +1,12 @@
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+bin
+.vs
+obj
+UnityTranspiler
+typeCache.json
+log.txt
+Map
+docker-*
+run.bat
