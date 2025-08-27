@@ -41,15 +41,8 @@ public class AngleOfAttack
         if (quaternion.Length != 4 || vInertial.Length != 3)
             throw new ArgumentException("Invalid input sizes.");
 
-        // Rotation matrix (inertial to body)
-        double[,] R = AvionicsMath.RotationMatrix(quaternion);
-
         // Matrix-vector multiplication: v_body = R * v_inertial
-        double[] vBody = new double[3];
-        for (int i = 0; i < 3; i++)
-        {
-            vBody[i] = R[i, 0] * vInertial[0] + R[i, 1] * vInertial[1] + R[i, 2] * vInertial[2];
-        }
+        double[] vBody = AvionicsMath.FrameTransform(quaternion, vInertial);
 
         return vBody;
     }

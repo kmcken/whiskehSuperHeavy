@@ -30,4 +30,24 @@ public class AvionicsMath
 
         return R;
     }
+    
+    /// <summary>
+    /// Transforms a vector from inertial to body frame using quaternion.
+    /// </summary>
+    public static double[] FrameTransform(double[] q, double[] vecInertial)
+    {
+        double w = q[0], x = q[1], y = q[2], z = q[3];
+
+        // Rotation matrix (inertial to body)
+        double[,] R = RotationMatrix(q);
+
+        // Matrix-vector multiplication
+        double[] vecBody = new double[3];
+        for (int i = 0; i < 3; i++)
+        {
+            vecBody[i] = R[i, 0] * vecInertial[0] + R[i, 1] * vecInertial[1] + R[i, 2] * vecInertial[2];
+        }
+
+        return vecBody;
+    }
 }
