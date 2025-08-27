@@ -1,6 +1,6 @@
 ﻿namespace whiskehSuperHeavy.Avionics;
 
-public class GLoading
+public static class GLoading
 {
     private static double[] prevVelocityInertial = null;
     private const double g = 9.80665; // m/s²
@@ -11,9 +11,11 @@ public class GLoading
     /// Computes G-loadings [n_x, n_y, n_z, total_G] from quaternion and current inertial velocity.
     /// Returns null if no previous velocity.
     /// </summary>
-    public static double[] ComputeGLoadings(double[] q, double[] vInertialCurrent)
+    /// <param name="quaternion">Quaternion [w, x, y, z]</param>
+    /// <param name="vInertialCurrent">Current inertial velocity [vx, vy, vz]</param>
+    public static double[] ComputeGLoadings(double[] quaternion, double[] vInertialCurrent)
     {
-        if (prevVelocityInertial == null || q.Length != 4 || vInertialCurrent.Length != 3)
+        if (prevVelocityInertial == null || quaternion.Length != 4 || vInertialCurrent.Length != 3)
             return null;
 
         // Step 1: Inertial acceleration
@@ -32,7 +34,8 @@ public class GLoading
         }
 
         // Step 3: Transform to body frame
-        double[] fBody = AvionicsMath.FrameTransform(q, fInertial);
+        double[,] R = AvionicsMath.RotationMatrixInertialToBody(quaternion);
+        double[] fBody = AvionicsMath.FrameTransform(R, fInertial);
 
         // Step 4: Load factors
         double n_x = fBody[0] / g;
