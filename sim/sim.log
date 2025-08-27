@@ -1,0 +1,44 @@
+[INFO] Starting HSGE
+[INFO] Setting ASF-58 to inactive
+[INFO] [HSGE] Loading options from ..\simConfig.json
+[INFO] [HSGE] Option set:     allied = ../bin/Debug/net6.0/whiskehSuperHeavy.dll
+[INFO] [HSGE] Option set:     enemy = ../bin/Debug/net6.0/whiskehSuperHeavy.dll
+[INFO] [HSGE] Option set:     debugAllied = True
+[WARN] [HSGE] Option default: debugEnemy = False
+[WARN] [HSGE] Option default: alliedCount = 1
+[WARN] [HSGE] Option default: enemyCount = 1
+[WARN] [HSGE] Option default: spawnDist = 72000
+[WARN] [HSGE] Option default: spawnAlt = 6000
+[WARN] [HSGE] Option default: maxTime = 300
+[WARN] [HSGE] Option default: noMap = False
+[INFO] [HSGE] Option set:     map = ../../Map/
+[WARN] [HSGE] Option default: weaponMaxes = 
+[WARN] [HSGE] Option default: alliedArgs = System.String[]
+[WARN] [HSGE] Option default: enemyArgs = System.String[]
+[INFO] [HSGE] Recording file output: E:\VTOLVR\AIP\whiskehSuperHeavy\sim\recording.json
+[INFO] [HSGE] Spawn1: (140526.62, 6000, 42244.227), spawn2: (51871.35, 6000, 155717.75)
+[INFO] [HSGE] Loading AIP for AIClient on team Allied from AIPProvider
+[INFO] [HSGE] Map load path: E:\VTOLVR\AIP\Map\
+[INFO] [HSGE] Checking to load ../../Map/height0.png
+[INFO] [HSGE] Checking to load ../../Map/height1.png
+[INFO] [HSGE] Checking to load ../../Map/height2.png
+[INFO] [HSGE] Checking to load ../../Map/height3.png
+[INFO] [HSGE] Loaded 4 heightmap images
+[INFO] [HSGE] Loading VT file: ../../Map/TestMission2.vtm
+[INFO] [HSGE] Loading VT file: ../../Map/TestMission2.vts
+[INFO] [HSGE] Loaded map and mission VT files!
+[INFO] [HSGE] Loading height from 4 images
+[INFO] [HSGE] Loading AIP for AIClient on team Enemy from AIPProvider
+[INFO] [HSGE] Init Event: id=2 path=Vehicles/FA-26B name=whiskehXv0
+[INFO] [HSGE] Init Event: id=1 path=Vehicles/FA-26B name=whiskehXv0
+[INFO] [HSGE] Requesting spawn HPEquips/AFighter/fa26_gun onto hp 0
+[INFO] [HSGE] Requesting spawn HPEquips/AFighter/fa26_gun onto hp 0
+[WARN] [HSGE] Kplane speed is too small
+[WARN] [HSGE] Kplane speed is too small
+[INFO] Sim time: 10s. Sim seconds/second: 14.03, Ticks Per Second: 1264
+[INFO] Sim time: 20s. Sim seconds/second: 152.21, Ticks Per Second: 13713
+[INFO] Sim time: 30s. Sim seconds/second: 153.63, Ticks Per Second: 13840
+[INFO] [HSGE] AIP whiskehXv0 (1) executed 2763 frames, 0.0007101339124140135 ms/frame
+[INFO] [HSGE] AIP whiskehXv0 (2) executed 2763 frames, 0.00018241042345276074 ms/frame
+[INFO] [HSGE] Winning team: Enemy
+[INFO] [HSGE] Recorder ending simulation
