@@ -18,7 +18,8 @@ public class AIPProvider : IAIPProvider {
         return new InboundState
         {
             pyr = new NetVector { x = 0, y = 0, z = 0 },
-            throttle = 100
+            throttle = 100,
+            irLookDir = new NetVector { x = 0f, y = 0f, z = 1f }
         };
     }
 }

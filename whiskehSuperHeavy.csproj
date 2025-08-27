@@ -5,7 +5,12 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-
+    
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Condition="!Exists('.\devOnBuild.bat')" Command="call onBuild.bat" />
+        <Exec Condition="Exists('.\devOnBuild.bat')" Command="call devOnBuild.bat" />
+    </Target>
+    
     <ItemGroup>
       <Folder Include="sim\" />
     </ItemGroup>
