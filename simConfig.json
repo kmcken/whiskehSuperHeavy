@@ -1,6 +1,6 @@
 {
   "allied": "../bin/Debug/net6.0/whiskehSuperHeavy.dll",
   "enemy": "../bin/Debug/net6.0/whiskehSuperHeavy.dll",
-  "map": "../../Maps/midway",
+  "map": "../../Maps/midway/",
   "debugAllied": true
 }
