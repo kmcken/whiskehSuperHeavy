@@ -5,13 +5,7 @@ using whiskehSuperHeavy.Avionics;
 
 public class AIPProvider : IAIPProvider
 {
-    private static Quaternion _refQuaternion = Quaternion.identity;
-    private Quaternion _quaternion = Quaternion.identity;
-    private Vector3 _inertialVelocity = Vector3.one;
-    private Vector3 _bodyVelocity = Vector3.zero;
-    private Vector3 _velocityVectorPitchAzi = Vector2.zero;
-    private Vector3 _noseVectorPitchAziRoll = Vector3.zero;
-    private Vector3 _alphaBeta = Vector2.zero;
+    private FlightData _flightData = new FlightData(Vector3.zero, Quaternion.identity, Vector3.zero);
     
     public override SetupActions Start(SetupInfo info)
     {
@@ -26,26 +20,23 @@ public class AIPProvider : IAIPProvider
     
     public override InboundState Update(OutboundState state)
     {
-        _quaternion.Set(state.kinematics.rotation.x, state.kinematics.rotation.y, 
-            state.kinematics.rotation.z, state.kinematics.rotation.w);
-        _quaternion = Quaternion.Inverse(_quaternion);
+        _flightData.Quaternions.Set(-1 * state.kinematics.rotation.x, -1 * state.kinematics.rotation.y, 
+            -1 * state.kinematics.rotation.z, state.kinematics.rotation.w);
         
-        _inertialVelocity.Set(state.kinematics.velocity.x, state.kinematics.velocity.y, 
+        _flightData.InertialVelocity.Set(state.kinematics.velocity.x, state.kinematics.velocity.y, 
             state.kinematics.velocity.z);
         
-        _bodyVelocity = AvionicsMath.BodyVelocity(_quaternion, _inertialVelocity);
-        
-        _noseVectorPitchAziRoll = AvionicsMath.NoseVectorPitchAziRoll(_quaternion);
-        
-        _velocityVectorPitchAzi = AvionicsMath.VelocityVectorPitchAzi(_inertialVelocity);
+        _flightData.InertialPosition.Set(state.kinematics.position.x, state.kinematics.position.y, 
+            state.kinematics.position.z);
 
-        _alphaBeta = AvionicsMath.AlphaBeta(_quaternion, _inertialVelocity);
-        
-        // Graph("airspeed", Convert.ToSingle(airspeed));
-        Graph("alphabeta", _alphaBeta);
-        Graph("bodyVelocity", _bodyVelocity);
-        Graph("noseVec PitchAziRoll", _noseVectorPitchAziRoll);
-        Graph("velVec PitchAzi", _velocityVectorPitchAzi);
+        Graph("airspeed", _flightData.Airspeed);
+        Graph("alpha", _flightData.Alpha);
+        Graph("beta", _flightData.Beta);
+        Graph("nosePitch", _flightData.NoseVecPitch);
+        Graph("velPitch", _flightData.VelVecPitch);
+        Graph("noseAzi", _flightData.NoseVecAzi);
+        Graph("velAzi", _flightData.VelVecAzi);
+        Graph("noseRoll", _flightData.NoseVecRoll);
         
         return new InboundState
         {
