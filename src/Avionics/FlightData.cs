@@ -1,20 +1,17 @@
 ﻿using System.Text.RegularExpressions;
 using UnityGERunner;
+using UnityGERunner.UnityApplication;
 
 namespace whiskehSuperHeavy.Avionics;
 
 public class FlightData
 {
-    public Vector3 InertialPosition;
-    public Quaternion Quaternions;
-    public Vector3 InertialVelocity;
-
-    public FlightData( Vector3 inertialPosition, Quaternion quaternion, Vector3 inertialVelocity)
-    {
-        InertialPosition = inertialPosition;
-        Quaternions = quaternion;
-        InertialVelocity = inertialVelocity;
-    }
+    public FlightData() { }
+    
+    public OutboundState State;
+    public Vector3 InertialPosition => State.kinematics.position;
+    public Quaternion Quaternions => Quaternion.Inverse(State.kinematics.rotation);
+    public Vector3 InertialVelocity => State.kinematics.velocity;
 
     private double[,] RotationMatrix => RotationMatrixInertialToBody(Quaternions);
     private double[,] RotationTranspose => RotationMatrixBodyToInertial(Quaternions);
@@ -33,7 +30,6 @@ public class FlightData
     public float VelVecAzi => Math.Atan2(InertialVelocity.x, InertialVelocity.z) * 180 / Math.PI < 0 ? 
         Convert.ToSingle(Math.Atan2(InertialVelocity.x, InertialVelocity.z) * 180 / Math.PI + 360) : 
         Convert.ToSingle(Math.Atan2(InertialVelocity.x, InertialVelocity.z) * 180 / Math.PI);
-
     
     /// <summary>
     /// Rotation Matrix from the Inertial to the Body Frame

@@ -5,7 +5,7 @@ using whiskehSuperHeavy.Avionics;
 
 public class AIPProvider : IAIPProvider
 {
-    private FlightData _flightData = new FlightData(Vector3.zero, Quaternion.identity, Vector3.zero);
+    private FlightData _flightData = new FlightData();
     
     public override SetupActions Start(SetupInfo info)
     {
@@ -20,14 +20,7 @@ public class AIPProvider : IAIPProvider
     
     public override InboundState Update(OutboundState state)
     {
-        _flightData.Quaternions.Set(-1 * state.kinematics.rotation.x, -1 * state.kinematics.rotation.y, 
-            -1 * state.kinematics.rotation.z, state.kinematics.rotation.w);
-        
-        _flightData.InertialVelocity.Set(state.kinematics.velocity.x, state.kinematics.velocity.y, 
-            state.kinematics.velocity.z);
-        
-        _flightData.InertialPosition.Set(state.kinematics.position.x, state.kinematics.position.y, 
-            state.kinematics.position.z);
+        _flightData.State = state;
 
         Graph("airspeed", _flightData.Airspeed);
         Graph("alpha", _flightData.Alpha);
