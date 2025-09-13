@@ -22,14 +22,16 @@ public class AIPProvider : IAIPProvider
     {
         _flightData.State = state;
 
-        Graph("airspeed", _flightData.Airspeed);
-        Graph("alpha", _flightData.Alpha);
-        Graph("beta", _flightData.Beta);
-        Graph("nosePitch", _flightData.NoseVecPitch);
-        Graph("velPitch", _flightData.VelVecPitch);
-        Graph("noseAzi", _flightData.NoseVecAzi);
-        Graph("velAzi", _flightData.VelVecAzi);
-        Graph("noseRoll", _flightData.NoseVecRoll);
+        // Graph("airspeed", _flightData.Airspeed());
+        // Graph("alpha", _flightData.Alpha());
+        // Graph("beta", _flightData.Beta());
+        // Graph("nosePitch", _flightData.NoseVecPitch());
+        // Graph("velPitch", _flightData.VelVecPitch());
+        // Graph("noseAzi", _flightData.NoseVecAzi());
+        // Graph("velAzi", _flightData.VelVecAzi());
+        // Graph("noseRoll", _flightData.NoseVecRoll());
+        Graph("noseVec", _flightData.NoseVecNorm());
+        Graph("velVec", _flightData.VelVecNorm());
         
         return new InboundState
         {

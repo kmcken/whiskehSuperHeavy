@@ -9,27 +9,89 @@ public class FlightData
     public FlightData() { }
     
     public OutboundState State;
-    public Vector3 InertialPosition => State.kinematics.position;
-    public Quaternion Quaternions => Quaternion.Inverse(State.kinematics.rotation);
-    public Vector3 InertialVelocity => State.kinematics.velocity;
+    private Vector3 InertialPosition => State.kinematics.position;
+    private Quaternion Quaternions => Quaternion.Inverse(State.kinematics.rotation);
+    private Vector3 InertialVelocity => State.kinematics.velocity;
 
-    private double[,] RotationMatrix => RotationMatrixInertialToBody(Quaternions);
-    private double[,] RotationTranspose => RotationMatrixBodyToInertial(Quaternions);
-    public Vector3 BodyVelocity => MatrixMultiplication(RotationMatrix, InertialVelocity);
-    public float Airspeed => Convert.ToSingle(InertialVelocity.magnitude * 1.94384);
-    public float Alpha => Convert.ToSingle(-1 * Math.Atan2(BodyVelocity.y, BodyVelocity.z) * (180 / Math.PI) + 1);
-    public float Beta => BodyVelocity.magnitude == 0 ? 0 : 
-        Convert.ToSingle(Math.Asin(BodyVelocity.x / BodyVelocity.magnitude) * (180 / Math.PI));
-    public float NoseVecPitch => Convert.ToSingle(Math.Asin(RotationMatrix[2,1]) * 180 / Math.PI);
-    public float NoseVecRoll => Convert.ToSingle(Math.Atan2(RotationMatrix[0,1], RotationMatrix[1,1]) * 180 / Math.PI);
-    public float NoseVecAzi => Math.Atan2(RotationMatrix[2, 0], RotationMatrix[0,0]) * 180 / Math.PI < 0 ? 
-        Convert.ToSingle(Math.Atan2(RotationMatrix[2, 0], RotationMatrix[0,0]) * 180 / Math.PI + 360) : 
-        Convert.ToSingle(Math.Atan2(RotationMatrix[2, 0], RotationMatrix[0,0]) * 180 / Math.PI);
-    public float VelVecPitch => Convert.ToSingle(Math.Atan2(InertialVelocity.y, 
-        Math.Sqrt(InertialVelocity.x * InertialVelocity.x + InertialVelocity.z * InertialVelocity.z)) * 180 / Math.PI);
-    public float VelVecAzi => Math.Atan2(InertialVelocity.x, InertialVelocity.z) * 180 / Math.PI < 0 ? 
-        Convert.ToSingle(Math.Atan2(InertialVelocity.x, InertialVelocity.z) * 180 / Math.PI + 360) : 
-        Convert.ToSingle(Math.Atan2(InertialVelocity.x, InertialVelocity.z) * 180 / Math.PI);
+    private double[,] RotationMatrix()
+    {
+        return RotationMatrixInertialToBody(Quaternions);
+    }
+
+    private double[,] RotationTranspose()
+    {
+        return RotationMatrixBodyToInertial(Quaternions);
+    }
+
+    public Vector3 BodyVelocity()
+    {
+        return MatrixMultiplication(RotationMatrix(), InertialVelocity);
+    }
+    
+    public float Airspeed()
+    {
+        return Convert.ToSingle(InertialVelocity.magnitude * 1.94384);
+    }
+    
+    public float Alpha()
+    {
+        var bodyVel = BodyVelocity();
+        return Convert.ToSingle(-1 * Math.Atan2(bodyVel.y, bodyVel.z) * (180 / Math.PI) + 1);
+    }
+
+    public float Beta()
+    {
+        var bodyVel = BodyVelocity();
+        return bodyVel.magnitude == 0 ? 0 : Convert.ToSingle(Math.Asin(bodyVel.x / bodyVel.magnitude) * (180 / Math.PI));
+    }
+
+    public float AltitudeMeanSeaLevel()
+    {
+        return Convert.ToSingle(InertialPosition.y * 3.28084);
+    }
+    
+    public float NoseVecPitch()
+    {
+        return Convert.ToSingle(Math.Asin(RotationMatrix()[2, 1]) * 180 / Math.PI);
+    }
+    
+    public float NoseVecRoll()
+    {
+        var rotation = RotationMatrixInertialToBody(Quaternions);
+        return Convert.ToSingle(Math.Atan2(rotation[0, 1], rotation[1, 1]) * 180 / Math.PI);
+    }
+
+    public float NoseVecAzi()
+    {
+        var rotation = RotationMatrixInertialToBody(Quaternions);
+        return Math.Atan2(rotation[2, 0], rotation[0,0]) * 180 / Math.PI < 0 ? 
+            Convert.ToSingle(Math.Atan2(rotation[2, 0], rotation[0,0]) * 180 / Math.PI + 360) : 
+            Convert.ToSingle(Math.Atan2(rotation[2, 0], rotation[0,0]) * 180 / Math.PI);
+    }
+
+    public float VelVecPitch()
+    {
+        return Convert.ToSingle(Math.Atan2(InertialVelocity.y, 
+            Math.Sqrt(InertialVelocity.x * InertialVelocity.x + InertialVelocity.z * InertialVelocity.z)) * 180 / Math.PI);
+    }
+    public float VelVecAzi()
+    {
+        return Math.Atan2(InertialVelocity.x, InertialVelocity.z) * 180 / Math.PI < 0
+            ? Convert.ToSingle(Math.Atan2(InertialVelocity.x, InertialVelocity.z) * 180 / Math.PI + 360)
+            : Convert.ToSingle(Math.Atan2(InertialVelocity.x, InertialVelocity.z) * 180 / Math.PI);
+    }
+    public Vector3 VelVecNorm()
+    {
+        return InertialVelocity.normalized;
+    }
+    public Vector3 NoseVecNorm()
+    {
+        var pitch = NoseVecPitch();
+        var azi = NoseVecAzi();
+        return new Vector3(Convert.ToSingle(Math.Cos(pitch) * Math.PI / 180 * Math.Cos(azi * Math.PI / 180)), 
+            Convert.ToSingle(Math.Sin(pitch * Math.PI / 180)),
+            Convert.ToSingle(Math.Sin(pitch * Math.PI / 180) * Math.Cos(azi * Math.PI / 180)));
+    }
     
     /// <summary>
     /// Rotation Matrix from the Inertial to the Body Frame
