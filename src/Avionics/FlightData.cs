@@ -6,26 +6,24 @@ namespace whiskehSuperHeavy.Avionics;
 
 public class FlightData
 {
-    public FlightData() { }
-    
     public OutboundState State;
-    private Vector3 InertialPosition => State.kinematics.position;
-    private Quaternion Quaternions => Quaternion.Inverse(State.kinematics.rotation);
-    private Vector3 InertialVelocity => State.kinematics.velocity;
+    public Vector3 InertialPosition => State.kinematics.position;
+    public Quaternion Quaternions => Quaternion.Inverse(State.kinematics.rotation);
+    public Vector3 InertialVelocity => State.kinematics.velocity;
 
     private double[,] RotationMatrix()
     {
-        return RotationMatrixInertialToBody(Quaternions);
+        return VectorMath.RotationMatrixInertialToBody(Quaternions);
     }
 
     private double[,] RotationTranspose()
     {
-        return RotationMatrixBodyToInertial(Quaternions);
+        return VectorMath.RotationMatrixBodyToInertial(Quaternions);
     }
 
     public Vector3 BodyVelocity()
     {
-        return MatrixMultiplication(RotationMatrix(), InertialVelocity);
+        return VectorMath.MatrixMultiplication(RotationMatrix(), InertialVelocity);
     }
     
     public float Airspeed()
@@ -52,21 +50,22 @@ public class FlightData
     
     public float NoseVecPitch()
     {
-        return Convert.ToSingle(Math.Asin(RotationMatrix()[2, 1]) * 180 / Math.PI);
+        return -1 * Quaternion.Inverse(Quaternions).eulerAngles.x;
     }
     
     public float NoseVecRoll()
     {
-        var rotation = RotationMatrixInertialToBody(Quaternions);
-        return Convert.ToSingle(Math.Atan2(rotation[0, 1], rotation[1, 1]) * 180 / Math.PI);
+        return Quaternion.Inverse(Quaternions).eulerAngles.z;
     }
 
     public float NoseVecAzi()
     {
-        var rotation = RotationMatrixInertialToBody(Quaternions);
-        return Math.Atan2(rotation[2, 0], rotation[0,0]) * 180 / Math.PI < 0 ? 
-            Convert.ToSingle(Math.Atan2(rotation[2, 0], rotation[0,0]) * 180 / Math.PI + 360) : 
-            Convert.ToSingle(Math.Atan2(rotation[2, 0], rotation[0,0]) * 180 / Math.PI);
+        var azi = Quaternion.Inverse(Quaternions).eulerAngles.y;
+        if (azi < 0)
+        {
+            return azi + 360;
+        }
+        return azi;
     }
 
     public float VelVecPitch()
@@ -88,78 +87,9 @@ public class FlightData
     {
         var pitch = NoseVecPitch();
         var azi = NoseVecAzi();
-        return new Vector3(Convert.ToSingle(Math.Cos(pitch) * Math.PI / 180 * Math.Cos(azi * Math.PI / 180)), 
+        var noseVec = new Vector3(Convert.ToSingle(Math.Cos(pitch * Math.PI / 180) * Math.Sin(azi * Math.PI / 180)),
             Convert.ToSingle(Math.Sin(pitch * Math.PI / 180)),
-            Convert.ToSingle(Math.Sin(pitch * Math.PI / 180) * Math.Cos(azi * Math.PI / 180)));
-    }
-    
-    /// <summary>
-    /// Rotation Matrix from the Inertial to the Body Frame
-    /// Transforms a vector from inertial to body frame using quaternion.
-    /// </summary>
-    /// <param name="quaternion">Quaternion [w, x, y, z]</param>
-    private static double[,] RotationMatrixInertialToBody(Quaternion quaternion)
-    {
-        // Rotation matrix (inertial to body)
-        double[,] rotation = new double[3, 3];
-        // Row 1
-        rotation[0, 0] = 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
-        rotation[0, 1] = 2 * (quaternion.x * quaternion.y - quaternion.w * quaternion.z);
-        rotation[0, 2] = 2 * (quaternion.x * quaternion.z + quaternion.w * quaternion.y);
-
-        // Row 2
-        rotation[1, 0] = 2 * (quaternion.x * quaternion.y + quaternion.w * quaternion.z);
-        rotation[1, 1] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.z * quaternion.z);
-        rotation[1, 2] = 2 * (quaternion.y * quaternion.z - quaternion.w * quaternion.x);
-
-        // Row 3
-        rotation[2, 0] = 2 * (quaternion.x * quaternion.z - quaternion.w * quaternion.y);
-        rotation[2, 1] = 2 * (quaternion.y * quaternion.z + quaternion.w * quaternion.x); 
-        rotation[2, 2] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
-
-        return rotation;
-    }
-    
-    /// <summary>
-    /// Rotation Matrix from the Body to the Inertial Frame
-    /// Transforms a vector from body to inertial frame using quaternion.
-    /// </summary>
-    /// <param name="quaternion">Quaternion [w, x, y, z]</param>
-    private static double[,] RotationMatrixBodyToInertial(Quaternion quaternion)
-    {
-        // Rotation matrix (inertial to body)
-        double[,] rotation = new double[3, 3];
-        // Column 1
-        rotation[0, 0] = 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
-        rotation[1, 0] = 2 * (quaternion.x * quaternion.y - quaternion.w * quaternion.z);
-        rotation[2, 0] = 2 * (quaternion.x * quaternion.z + quaternion.w * quaternion.y);
-
-        // Column 2
-        rotation[0, 1] = 2 * (quaternion.x * quaternion.y + quaternion.w * quaternion.z);
-        rotation[1, 1] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.z * quaternion.z);
-        rotation[2, 1] = 2 * (quaternion.y * quaternion.z - quaternion.w * quaternion.x);
-
-        // Column 3
-        rotation[0, 2] = 2 * (quaternion.x * quaternion.z - quaternion.w * quaternion.y);
-        rotation[1, 2] = 2 * (quaternion.y * quaternion.z + quaternion.w * quaternion.x); 
-        rotation[2, 2] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
-
-        return rotation;
-    }
-    
-    /// <summary>
-    /// Transforms a vector from one frame to another.
-    /// </summary>
-    /// <param name="rotation">Rotation matrix</param>
-    /// <param name="vectorIn">Rotation matrix</param>
-    private static Vector3 MatrixMultiplication(double[,] rotation, Vector3 vectorIn)
-    {
-        // Matrix-vector multiplication
-        Vector3 vectorOut = Vector3.zero;
-        vectorOut.x = Convert.ToSingle(rotation[0, 0] * vectorIn.x + rotation[0, 1] * vectorIn.y + rotation[0, 2] * vectorIn.z);
-        vectorOut.y = Convert.ToSingle(rotation[1, 0] * vectorIn.x + rotation[1, 1] * vectorIn.y + rotation[1, 2] * vectorIn.z);
-        vectorOut.z = Convert.ToSingle(rotation[2, 0] * vectorIn.x + rotation[2, 1] * vectorIn.y + rotation[2, 2] * vectorIn.z);
-        
-        return vectorOut;
+            Convert.ToSingle(Math.Cos(pitch * Math.PI / 180) * Math.Cos(azi * Math.PI / 180)));
+        return noseVec.normalized;
     }
 }
